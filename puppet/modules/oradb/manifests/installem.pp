@@ -213,7 +213,7 @@ define oradb::installem(
     }
 
     exec { "run root.sh script ${title}":
-      command   => "${oracleHome}/oms/allroot.sh",
+      command   => "${oracle_home_dir}/oms/allroot.sh",
       user      => 'root',
       group     => 'root',
       path      => $execPath,
