@@ -1,0 +1,14 @@
+---
+
+hosts:
+  'emdb.example.com':
+    ip:                "10.10.10.15"
+    host_aliases:      'emdb'
+  'emapp.example.com':
+    ip:                "10.10.10.25"
+    host_aliases:      'emapp'
+  'localhost':
+    ip:                "127.0.0.1"
+    host_aliases:      'localhost.localdomain,localhost4,localhost4.localdomain4'
+
+
