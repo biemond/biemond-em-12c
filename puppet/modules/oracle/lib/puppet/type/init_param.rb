@@ -30,7 +30,7 @@ module Puppet
         specified_value = "'#{self[:value]}'"
       end
       statement = "alter system set #{parameter_name}=#{specified_value} scope=#{scope}"
-      statement+= " sid='#{for_sid}'" if scope == :spfile
+      statement+= " sid='#{for_sid}'" if scope == :SPFILE
       command_builder.add(statement, :sid => sid)
     end
 
@@ -74,7 +74,7 @@ module Puppet
     end
 
     def self.parse_for_sid
-      lambda { |for_sid| for_sid.nil? ?  default_sid : for_sid[1..-1]}
+      lambda { |for_sid| for_sid.nil? ?  '*' : for_sid[1..-1]}
     end
 
     def self.parse_sid
