@@ -21,7 +21,7 @@ describe init_param do
 
 
   it 'should have :name and :parameter_name be its namevar' do
-    expect(@class.key_attributes).to eq([:name, :parameter_name, :instance])
+    expect(@class.key_attributes).to eq([:name, :parameter_name, :for_sid])
   end
 
   describe ':paremeter_name' do

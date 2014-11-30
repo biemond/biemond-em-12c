@@ -134,7 +134,6 @@ class oradb_12c {
       version                 => '12.1',
       user                    => hiera('oracle_os_user'),
       group                   => hiera('oracle_os_group'),
-      template                => 'dbtemplate',
       downloadDir             => hiera('oracle_download_dir'),
       action                  => 'create',
       dbName                  => hiera('oracle_database_name'),
@@ -173,51 +172,54 @@ class oradb_12c {
 class oradb_init {
   require oradb_12c
 
-  init_param{'SPFILE/processes:emrepos':
-    ensure  => present,
-    value   => '600',
+  init_param { 'SPFILE/OPEN_CURSORS:*@emrepos':
+    ensure => 'present',
+    value  => '300',
+  }
+  init_param { 'SPFILE/PGA_AGGREGATE_TARGET:*@emrepos':
+    ensure => 'present',
+    value  => '1G',
+  }
+  init_param { 'SPFILE/processes:*@emrepos':
+    ensure => 'present',
+    value  => '600',
   }
 
-  init_param{'SPFILE/job_queue_processes:emrepos':
+  init_param { 'SPFILE/SGA_TARGET:*@emrepos':
+    ensure => 'present',
+    value  => '1200M',
+  }
+  init_param { 'SPFILE/SHARED_POOL_SIZE:*@emrepos':
+    ensure => 'present',
+    value  => '600M',
+  }
+
+  init_param{'SPFILE/job_queue_processes:*@emrepos':
     ensure  => present,
     value   => '20',
   }
 
-  init_param{'SPFILE/session_cached_cursors:emrepos':
+  init_param{'SPFILE/session_cached_cursors:*@emrepos':
     ensure  => present,
     value   => '200',
   }
 
-  init_param{'SPFILE/db_securefile:emrepos':
+  init_param{'SPFILE/db_securefile:*@emrepos':
     ensure  => present,
     value   => 'PERMITTED',
   }
 
-  init_param{'SPFILE/sga_target:emrepos':
-    ensure  => present,
-    value   => '1200M',
-  }
-
-  init_param{'SPFILE/shared_pool_size:emrepos':
-    ensure  => present,
-    value   => '600M',
-  }
-
-  init_param{'SPFILE/pga_aggregate_target:emrepos':
-    ensure  => present,
-    value   => '1G',
-  }
-
-  init_param{'SPFILE/memory_target:emrepos':
+  init_param{'SPFILE/memory_target:*@emrepos':
     ensure  => present,
     value   => '3000M',
-    require => [Init_param['SPFILE/processes:emrepos'],
-                Init_param['SPFILE/job_queue_processes:emrepos'],
-                Init_param['SPFILE/session_cached_cursors:emrepos'],
-                Init_param['SPFILE/db_securefile:emrepos'],
-                Init_param['SPFILE/sga_target:emrepos'],
-                Init_param['SPFILE/shared_pool_size:emrepos'],
-                Init_param['SPFILE/pga_aggregate_target:emrepos'],],
+    require => [Init_param['SPFILE/OPEN_CURSORS:*@emrepos'],
+                Init_param['SPFILE/processes:*@emrepos'],
+                Init_param['SPFILE/job_queue_processes:*@emrepos'],
+                Init_param['SPFILE/session_cached_cursors:*@emrepos'],
+                Init_param['SPFILE/db_securefile:*@emrepos'],
+                Init_param['SPFILE/SGA_TARGET:*@emrepos'],
+                Init_param['SPFILE/SHARED_POOL_SIZE:*@emrepos'],
+                Init_param['SPFILE/PGA_AGGREGATE_TARGET:*@emrepos'],],
   }
 
   db_control{'emrepos restart':
@@ -226,7 +228,7 @@ class oradb_init {
     oracle_product_home_dir => hiera('oracle_home_dir'),
     os_user                 => hiera('oracle_os_user'),
     refreshonly             => true,
-    subscribe               => Init_param['SPFILE/memory_target:emrepos'],
+    subscribe               => Init_param['SPFILE/memory_target:*@emrepos'],
   }
 
 }
