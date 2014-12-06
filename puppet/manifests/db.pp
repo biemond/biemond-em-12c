@@ -2,6 +2,7 @@ node 'emdb.example.com'  {
   include oradb_os
   include oradb_12c
   include oradb_init
+  include oradb_em_agent
 }
 
 # operating settings for Database & Middleware
@@ -235,5 +236,47 @@ class oradb_init {
                                 Init_param['SPFILE/PGA_AGGREGATE_TARGET:emrepos'],
                                 Init_param['SPFILE/memory_target:emrepos'],],
   }
+
+}
+
+class oradb_em_agent {
+  
+  # oradb::installem_agent{ 'em12104_agent':
+  #   version                     => '12.1.0.4',
+  #   source                      => 'https://10.10.10.25:7802/em/install/getAgentImage',
+  #   install_type                => 'agentPull',
+  #   install_platform            => 'Linux x86-64',
+  #   oracle_base_dir             => '/oracle',
+  #   agent_base_dir              => '/oracle/product/12.1/agent',
+  #   agent_instance_home_dir     => '/oracle/product/12.1/agent/agent_inst',
+  #   sysman_user                 => 'sysman',
+  #   sysman_password             => 'Welcome01',
+  #   agent_registration_password => 'Welcome01',
+  #   agent_port                  => 1830,
+  #   oms_host                    => '10.10.10.25',
+  #   oms_port                    => 7802,
+  #   em_upload_port              => 4903,
+  #   user                        => 'oracle',
+  #   group                       => 'dba',
+  #   download_dir                => '/var/tmp/install',
+  #   log_output                  => true,
+  # }
+
+  # oradb::installem_agent{ 'em12104_agent2':
+  #   version                     => '12.1.0.4',
+  #   source                      => '/var/tmp/install/agent.zip',
+  #   install_type                => 'agentDeploy',
+  #   oracle_base_dir             => '/oracle',
+  #   agent_base_dir              => '/oracle/product/12.1/agent2',
+  #   agent_instance_home_dir     => '/oracle/product/12.1/agent2/agent_inst',
+  #   agent_registration_password => 'Welcome01',
+  #   agent_port                  => 1832,
+  #   oms_host                    => '10.10.10.25',
+  #   em_upload_port              => 4903,
+  #   user                        => 'oracle',
+  #   group                       => 'dba',
+  #   download_dir                => '/var/tmp/install',
+  #   log_output                  => true,
+  # }
 
 }
