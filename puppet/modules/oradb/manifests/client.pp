@@ -154,20 +154,20 @@ define oradb::client(
 
     # cleanup
     exec { "remove oracle client extract folder ${title}":
-      command   => "rm -rf ${downloadDir}/client_${version}",
-      user      => 'root',
-      group     => 'root',
-      path      => $execPath,
-      require   => Exec["install oracle net ${title}"],
+      command => "rm -rf ${downloadDir}/client_${version}",
+      user    => 'root',
+      group   => 'root',
+      path    => $execPath,
+      require => Exec["install oracle net ${title}"],
     }
 
     if ( $remoteFile == true ){
       exec { "remove oracle client file ${file} ${title}":
-        command   => "rm -rf ${downloadDir}/${file}",
-        user      => 'root',
-        group     => 'root',
-        path      => $execPath,
-        require   => Exec["install oracle net ${title}"],
+        command => "rm -rf ${downloadDir}/${file}",
+        user    => 'root',
+        group   => 'root',
+        path    => $execPath,
+        require => Exec["install oracle net ${title}"],
       }
     }
 

@@ -215,33 +215,33 @@ define oradb::installdb(
     # cleanup
     if ( $zipExtract ) {
       exec { "remove oracle db extract folder ${title}":
-        command   => "rm -rf ${downloadDir}/${file}",
-        user      => 'root',
-        group     => 'root',
-        path      => $execPath,
-        cwd       => $oracleBase,
-        require   => [Exec["install oracle database ${title}"],
-                      Exec["run root.sh script ${title}"],],
+        command => "rm -rf ${downloadDir}/${file}",
+        user    => 'root',
+        group   => 'root',
+        path    => $execPath,
+        cwd     => $oracleBase,
+        require => [Exec["install oracle database ${title}"],
+                    Exec["run root.sh script ${title}"],],
       }
 
       if ( $remoteFile == true ){
         exec { "remove oracle db file1 ${file1} ${title}":
-          command   => "rm -rf ${downloadDir}/${file1}",
-          user      => 'root',
-          group     => 'root',
-          path      => $execPath,
-          cwd       => $oracleBase,
-          require   => [Exec["install oracle database ${title}"],
-                        Exec["run root.sh script ${title}"],],
+          command => "rm -rf ${downloadDir}/${file1}",
+          user    => 'root',
+          group   => 'root',
+          path    => $execPath,
+          cwd     => $oracleBase,
+          require => [Exec["install oracle database ${title}"],
+                      Exec["run root.sh script ${title}"],],
         }
         exec { "remove oracle db file2 ${file2} ${title}":
-          command   => "rm -rf ${downloadDir}/${file2}",
-          user      => 'root',
-          group     => 'root',
-          path      => $execPath,
-          cwd       => $oracleBase,
-          require   => [Exec["install oracle database ${title}"],
-                        Exec["run root.sh script ${title}"],],
+          command => "rm -rf ${downloadDir}/${file2}",
+          user    => 'root',
+          group   => 'root',
+          path    => $execPath,
+          cwd     => $oracleBase,
+          require => [Exec["install oracle database ${title}"],
+                      Exec["run root.sh script ${title}"],],
         }
       }
     }

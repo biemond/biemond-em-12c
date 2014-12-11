@@ -231,30 +231,30 @@ define oradb::installasm(
     # cleanup
     if ( $zipExtract ) {
       exec { "remove oracle asm extract folder ${title}":
-        command   => "rm -rf ${downloadDir}/${file_without_ext}",
-        user      => 'root',
-        group     => 'root',
-        path      => $execPath,
-        require   => Exec["install oracle grid ${title}"],
+        command => "rm -rf ${downloadDir}/${file_without_ext}",
+        user    => 'root',
+        group   => 'root',
+        path    => $execPath,
+        require => Exec["install oracle grid ${title}"],
       }
 
       if ( $remoteFile == true ){
         if ( $version == '12.1.0.1') {
           exec { "remove oracle asm file2 ${file2} ${title}":
-            command   => "rm -rf ${downloadDir}/${file2}",
-            user      => 'root',
-            group     => 'root',
-            path      => $execPath,
-            require   => Exec["install oracle grid ${title}"],
+            command => "rm -rf ${downloadDir}/${file2}",
+            user    => 'root',
+            group   => 'root',
+            path    => $execPath,
+            require => Exec["install oracle grid ${title}"],
           }
         }
 
         exec { "remove oracle asm file1 ${file1} ${title}":
-          command   => "rm -rf ${downloadDir}/${file1}",
-          user      => 'root',
-          group     => 'root',
-          path      => $execPath,
-          require   => Exec["install oracle grid ${title}"],
+          command => "rm -rf ${downloadDir}/${file1}",
+          user    => 'root',
+          group   => 'root',
+          path    => $execPath,
+          require => Exec["install oracle grid ${title}"],
         }
       }
     }

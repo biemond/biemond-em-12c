@@ -116,13 +116,6 @@ define oradb::opatchupgrade(
           }
         }
 
-        exec { "remove oracle file ${patchFile} ${title}":
-          command   => "rm -rf ${downloadDir}/${patchFile}",
-          user      => 'root',
-          group     => 'root',
-          path      => $execPath,
-          require   => Exec["extract opatch ${title} ${patchFile}"],
-        }
       }
       default: {
         fail('Unrecognized operating system')
