@@ -100,7 +100,7 @@ class oradb_12c {
       oracleBase             => hiera('oracle_base_dir'),
       oracleHome             => hiera('oracle_home_dir'),
       userBaseDir            => '/home',
-      createUser             => true,
+      createUser             => false,
       bashProfile            => false,
       user                   => hiera('oracle_os_user'),
       group                  => hiera('oracle_os_group'),
