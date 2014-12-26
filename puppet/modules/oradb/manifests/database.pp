@@ -7,7 +7,7 @@
 define oradb::database(
   $oracleBase               = undef,
   $oracleHome               = undef,
-  $version                  = '11.2',
+  $version                  = '11.2', # 11.2|12.1
   $user                     = 'oracle',
   $group                    = 'dba',
   $downloadDir              = '/install',
@@ -26,7 +26,7 @@ define oradb::database(
   $sampleSchema             = TRUE,
   $memoryPercentage         = '40',
   $memoryTotal              = '800',
-  $databaseType             = 'MULTIPURPOSE',
+  $databaseType             = 'MULTIPURPOSE', # MULTIPURPOSE|DATA_WAREHOUSING|OLTP
   $emConfiguration          = 'NONE',  # CENTRAL|LOCAL|ALL|NONE
   $storageType              = 'FS', #FS|CFS|ASM
   $asmSnmpPassword          = 'Welcome01',
@@ -34,6 +34,7 @@ define oradb::database(
   $asmDiskgroup             = 'DATA',
   $recoveryDiskgroup        = undef,
   $cluster_nodes            = undef,
+  $containerDatabase        = false, # 12.1 feature for pluggable database
 ){
   if (!( $version in ['11.2','12.1'])) {
     fail('Unrecognized version')
@@ -59,6 +60,10 @@ define oradb::database(
     fail('Unrecognized storageType')
   }
 
+  if ( $version == '11.2' and $containerDatabase == true ){
+    fail('container or pluggable database is not supported on version 11.2')
+  }
+
   $continue = true
 
   if ( $continue ) {
@@ -70,6 +75,16 @@ define oradb::database(
       default: {
         fail('Unrecognized operating system')
       }
+    }
+
+    if (is_hash($initParams) or is_string($initParams)) {
+      if is_hash($initParams) {
+        $sanitizedInitParams = join(join_keys_to_values($initParams, '='),',')
+      } else {
+        $sanitizedInitParams = $initParams
+      }
+    } else {
+      fail 'initParams only supports a String or a Hash as value type'
     }
 
     $sanitized_title = regsubst($title, '[^a-zA-Z0-9.-]', '_', 'G')
@@ -105,9 +120,10 @@ define oradb::database(
       }
     }
 
+
     if $action == 'create' {
       if ( $template ) {
-        $command = "dbca -silent -createDatabase -templateName ${templatename} -gdbname ${globalDbName} -responseFile NO_VALUE -sysPassword ${sysPassword} -systemPassword ${systemPassword}"
+        $command = "dbca -silent -createDatabase -templateName ${templatename} -gdbname ${globalDbName} -responseFile NO_VALUE -sysPassword ${sysPassword} -systemPassword ${systemPassword} -dbsnmpPassword ${dbSnmpPassword} -asmsnmpPassword ${asmSnmpPassword} -storageType ${storageType} -emConfiguration ${emConfiguration}"
       } else {
         $command = "dbca -silent -responseFile ${filename}"
       }
