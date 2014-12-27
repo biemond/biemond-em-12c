@@ -15,7 +15,7 @@ define oradb::installdb(
   $oracleHome              = undef,
   $eeOptionsSelection      = false,
   $eeOptionalComponents    = undef, # 'oracle.rdbms.partitioning:11.2.0.4.0,oracle.oraolap:11.2.0.4.0,oracle.rdbms.dm:11.2.0.4.0,oracle.rdbms.dv:11.2.0.4.0,oracle.rdbms.lbac:11.2.0.4.0,oracle.rdbms.rat:11.2.0.4.0'
-  $createUser              = true,
+  $createUser              = undef,
   $bashProfile             = true,
   $user                    = 'oracle',
   $userBaseDir             = '/home',
@@ -29,7 +29,6 @@ define oradb::installdb(
   $cluster_nodes           = undef,
 )
 {
-
   if ( $createUser == true ){
     fail("createUser parameter on installdb ${title} is removed from this oradb module, you need to create the oracle user and its groups yourself")
   }
@@ -71,30 +70,29 @@ define oradb::installdb(
     }
   }
 
+  $execPath     = '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:'
+
+  if $puppetDownloadMntPoint == undef {
+    $mountPoint     = 'puppet:///modules/oradb/'
+  } else {
+    $mountPoint     = $puppetDownloadMntPoint
+  }
+
+  if $oraInventoryDir == undef {
+    $oraInventory = "${oracleBase}/oraInventory"
+  } else {
+    $oraInventory = "${oraInventoryDir}/oraInventory"
+  }
+
+  oradb::utils::dbstructure{"oracle structure ${version}":
+    oracle_base_home_dir => $oracleBase,
+    ora_inventory_dir    => $oraInventory,
+    os_user              => $user,
+    os_group_install     => $group_install,
+    download_dir         => $downloadDir,
+  }
+
   if ( $continue ) {
-
-    $execPath     = '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:'
-
-    if $puppetDownloadMntPoint == undef {
-      $mountPoint     = 'puppet:///modules/oradb/'
-    } else {
-      $mountPoint     = $puppetDownloadMntPoint
-    }
-
-    if $oraInventoryDir == undef {
-      $oraInventory = "${oracleBase}/oraInventory"
-    } else {
-      $oraInventory = "${oraInventoryDir}/oraInventory"
-    }
-
-    oradb::utils::dbstructure{"oracle structure ${version}":
-      oracle_base_home_dir => $oracleBase,
-      ora_inventory_dir    => $oraInventory,
-      os_user              => $user,
-      os_group_install     => $group_install,
-      download_dir         => $downloadDir,
-      log_output           => true,
-    }
 
     if ( $zipExtract ) {
       # In $downloadDir, will Puppet extract the ZIP files or is this a pre-extracted directory structure.

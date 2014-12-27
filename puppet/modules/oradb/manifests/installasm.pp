@@ -79,29 +79,28 @@ define oradb::installasm(
     }
   }
 
+  if $oraInventoryDir == undef {
+    $oraInventory = "${gridBase}/oraInventory"
+  } else {
+    $oraInventory = "${oraInventoryDir}/oraInventory"
+  }
+
+  oradb::utils::dbstructure{"grid structure ${version}":
+    oracle_base_home_dir => $gridBase,
+    ora_inventory_dir    => $oraInventory,
+    os_user              => $user,
+    os_group_install     => $group_install,
+    download_dir         => $downloadDir,
+  }
+
   if ( $continue ) {
 
     $execPath     = '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:'
-
-    if $oraInventoryDir == undef {
-      $oraInventory = "${gridBase}/oraInventory"
-    } else {
-      $oraInventory = "${oraInventoryDir}/oraInventory"
-    }
 
     if $puppetDownloadMntPoint == undef {
       $mountPoint     = 'puppet:///modules/oradb/'
     } else {
       $mountPoint     = $puppetDownloadMntPoint
-    }
-
-    oradb::utils::dbstructure{"grid structure ${version}":
-      oracle_base_home_dir => $gridBase,
-      ora_inventory_dir    => $oraInventory,
-      os_user              => $user,
-      os_group_install     => $group_install,
-      download_dir         => $downloadDir,
-      log_output           => true,
     }
 
     if ( $zipExtract ) {
