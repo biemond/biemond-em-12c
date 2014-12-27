@@ -8,14 +8,25 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 
   config.vm.define "emdb" , primary: true do |emdb|
-    emdb.vm.box = "centos-6.5-x86_64"
-    emdb.vm.box_url = "https://dl.dropboxusercontent.com/s/np39xdpw05wfmv4/centos-6.5-x86_64.box"
+    emdb.vm.box = "centos-6.6-x86_64"
+    emdb.vm.box_url = "https://dl.dropboxusercontent.com/s/ijt3ppej789liyp/centos-6.6-x86_64.box"
+
+    emdb.vm.provider :vmware_fusion do |v, override|
+      override.vm.box = "centos-6.6-x86_64-vmware"
+      override.vm.box_url = "https://dl.dropboxusercontent.com/s/7ytmqgghoo1ymlp/centos-6.6-x86_64-vmware.box"
+    end
 
     emdb.vm.hostname = "emdb.example.com"
     emdb.vm.synced_folder ".", "/vagrant", :mount_options => ["dmode=777","fmode=777"]
     emdb.vm.synced_folder "/Users/edwin/software", "/software"
 
     emdb.vm.network :private_network, ip: "10.10.10.15"
+
+    emdb.vm.provider :vmware_fusion do |vb|
+      vb.vmx["numvcpus"] = "2"
+      vb.vmx["memsize"] = "3096"
+    end
+
 
     emdb.vm.provider :virtualbox do |vb|
       vb.customize ["modifyvm"     , :id, "--memory", "3096"]
@@ -42,14 +53,25 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define "emapp" , primary: true do |emapp|
-    emapp.vm.box = "centos-6.5-x86_64"
-    emapp.vm.box_url = "https://dl.dropboxusercontent.com/s/np39xdpw05wfmv4/centos-6.5-x86_64.box"
+    emapp.vm.box = "centos-6.6-x86_64"
+    emapp.vm.box_url = "https://dl.dropboxusercontent.com/s/ijt3ppej789liyp/centos-6.6-x86_64.box"
+
+    emapp.vm.provider :vmware_fusion do |v, override|
+      override.vm.box = "centos-6.6-x86_64-vmware"
+      override.vm.box_url = "https://dl.dropboxusercontent.com/s/7ytmqgghoo1ymlp/centos-6.6-x86_64-vmware.box"
+    end
 
     emapp.vm.hostname = "emapp.example.com"
     emapp.vm.synced_folder ".", "/vagrant", :mount_options => ["dmode=777","fmode=777"]
     emapp.vm.synced_folder "/Users/edwin/software", "/software"
 
     emapp.vm.network :private_network, ip: "10.10.10.25"
+
+    emapp.vm.provider :vmware_fusion do |vb|
+      vb.vmx["numvcpus"] = "2"
+      vb.vmx["memsize"] = "3372"
+    end
+
 
     emapp.vm.provider :virtualbox do |vb|
       vb.customize ["modifyvm"     , :id, "--memory", "3372"]
