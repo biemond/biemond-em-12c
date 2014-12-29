@@ -5,21 +5,19 @@
 define oradb::autostartdatabase(
   $oracleHome  = undef,
   $dbName      = undef,
-  $user        = 'oracle',
+  $user        = hiera('oradb:user'),
 ){
   include oradb::prepareautostart
 
-  $execPath    = '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:'
+  $execPath      = hiera('oradb:exec_path')
+  $oraTab        = hiera('oradb:oratab')
+  $dboraLocation = hiera('oradb:dbora_dir')
 
   case $::kernel {
     'Linux': {
-      $oraTab = '/etc/oratab'
-      $dboraLocation = '/etc/init.d'
       $sedCommand = "sed -i -e's/:N/:Y/g' ${oraTab}"
     }
     'SunOS': {
-      $oraTab = '/var/opt/oracle/oratab'
-      $dboraLocation = '/etc'
       $sedCommand = "sed -e's/:N/:Y/g' ${oraTab} > /tmp/oratab.tmp && mv /tmp/oratab.tmp ${oraTab}"
     }
     default: {

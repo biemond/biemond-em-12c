@@ -28,7 +28,7 @@ describe 'oradb::installasm', :type => :define do
 
     it do
       expect { should contain_notify("oradb::installasm /app/grid/product/11.2/grid does not exists")
-             }.to raise_error(Puppet::Error, /Unrecognized database grid install version, use 11.2.0.4 or 12.1.0.1/)
+             }.to raise_error(Puppet::Error, /Unrecognized database grid install version, use 11.2.0.4|12.1.0.1/)
     end
 
   end
@@ -59,7 +59,7 @@ describe 'oradb::installasm', :type => :define do
 
     it do
       expect { should contain_notify("oradb::installasm /app/grid/product/11.2/grid does not exists")
-             }.to raise_error(Puppet::Error, /Unrecognized operating system, please use it on a Linux or SunOS host/)
+             }.to raise_error(Puppet::Error, /Unrecognized operating system, please use it on a Linux|SunOS host/)
     end
 
   end

@@ -3,8 +3,8 @@
 #
 define oradb::tnsnames(
   $oracleHome         = undef,
-  $user               = 'oracle',
-  $group              = 'dba',
+  $user               = hiera('oradb:user'),
+  $group              = hiera('oradb:group'),
   $server             = {myserver => { host => undef, port => '1521', protocol => 'TCP' }},
   $loadbalance        = 'ON',
   $failover           = 'ON',

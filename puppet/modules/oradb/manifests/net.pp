@@ -2,18 +2,17 @@
 #
 define oradb::net(
   $oracleHome   = undef,
-  $version      = '11.2',
-  $user         = 'oracle',
-  $group        = 'dba',
-  $downloadDir  = '/install',
+  $version      = undef,
+  $user         = hiera('oradb:user'),
+  $group        = hiera('oradb:group'),
+  $downloadDir  = hiera('oradb:download_dir'),
   $dbPort       = '1521',
 ){
-  if $version in ['11.2','12.1'] {
-  } else {
-    fail('Unrecognized version')
+  if ( $version in hiera('oradb:net_versions') == false ) {
+    fail('Unrecognized version for oradb::net')
   }
 
-  $execPath = "${oracleHome}/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:"
+  $execPath = hiera('oradb:exec_path')
 
   file { "${downloadDir}/netca_${version}.rsp":
     ensure  => present,
@@ -25,7 +24,7 @@ define oradb::net(
   }
 
   exec { "install oracle net ${title}":
-    command     => "netca /silent /responsefile ${downloadDir}/netca_${version}.rsp",
+    command     => "${oracleHome}/bin/netca /silent /responsefile ${downloadDir}/netca_${version}.rsp",
     require     => File["${downloadDir}/netca_${version}.rsp"],
     creates     => "${oracleHome}/network/admin/listener.ora",
     path        => $execPath,

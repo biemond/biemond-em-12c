@@ -53,7 +53,7 @@ describe 'oradb::installdb', :type => :define do
 
     it do
       expect { should contain_notify("oradb::installdb /oracle/product/11.2/db does not exists")
-             }.to raise_error(Puppet::Error, /Unrecognized operating system, please use it on a Linux or SunOS host/)
+             }.to raise_error(Puppet::Error, /Unrecognized operating system, please use it on a Linux|SunOS host/)
     end
 
   end

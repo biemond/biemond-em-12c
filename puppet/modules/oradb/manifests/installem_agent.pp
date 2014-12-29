@@ -18,15 +18,21 @@ define oradb::installem_agent(
   $oms_host                    = undef, # 'emapp.example.com'
   $oms_port                    = undef, # 7802
   $em_upload_port              = undef, # 14511
-  $user                        = 'oracle',
-  $group                       = 'oinstall',
-  $download_dir                = '/install',
+  $user                        = hiera('oradb:user'),
+  $group                       = hiera('oradb:group_install'),
+  $download_dir                = hiera('oradb:download_dir'),
   $log_output                  = false,
 )
 {
 
-  if (!( $version in ['12.1.0.4'])){
-    fail('Unrecognized em agent version, use 12.1.0.4')
+  $supported_em_versions = join( hiera('oradb:enterprise_manager_agent_versions'), '|')
+  if ( $version in $supported_em_versions == false ){
+    fail("Unrecognized em agent version, use ${supported_em_versions}")
+  }
+
+  $supported_em_install_types = join( hiera('oradb:enterprise_manager_agent_install_types'), '|')
+  if ( $install_type in $supported_em_install_types == false ){
+    fail("Unrecognized install_type, use ${supported_em_install_types}" )
   }
 
   # check if the oracle software already exists
@@ -60,7 +66,7 @@ define oradb::installem_agent(
 
   if ( $continue ) {
 
-    $execPath = '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:'
+    $execPath = hiera('oradb:exec_path')
 
     # check oraInst
     oradb::utils::dborainst{"em agent orainst ${version}":
@@ -186,8 +192,6 @@ define oradb::installem_agent(
         require   => Exec["agentDeploy execute ${title}"],
       }
 
-    } else {
-      fail('Unrecognized install_type, use agentDeploy or agentPull' )
     }
   }
 }

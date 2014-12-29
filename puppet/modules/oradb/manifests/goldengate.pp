@@ -12,9 +12,9 @@ define oradb::goldengate(
   $goldengateHome          = undef,
   $managerPort             = undef,
   $user                    = 'ggate',
-  $group                   = 'dba',
-  $group_install           = 'oinstall',
-  $downloadDir             = '/install',
+  $group                   = hiera('oradb:group'),
+  $group_install           = hiera('oradb:group_install'),
+  $downloadDir             = hiera('oradb:download_dir'),
   $puppetDownloadMntPoint  = undef,
 )
 {
@@ -52,6 +52,7 @@ define oradb::goldengate(
     $continue = false
   }
 
+  $execPath = hiera('oradb:exec_path')
 
   if ( $version == '12.1.2' ) {
     $oraInventory    = "${oracleBase}/oraInventory"
@@ -107,7 +108,7 @@ define oradb::goldengate(
                     Exec['extract gg'],],
       creates   => $goldengateHome,
       timeout   => 0,
-      path      => '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin',
+      path      => $execPath,
       logoutput => true,
       user      => $user,
       group     => $group_install,
@@ -143,7 +144,7 @@ define oradb::goldengate(
       require   => File["${downloadDir}/${file}"],
       creates   => "${downloadDir}/${tarFile}",
       timeout   => 0,
-      path      => '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin',
+      path      => $execPath,
       user      => $user,
       group     => $group,
       logoutput => true,
@@ -164,7 +165,7 @@ define oradb::goldengate(
                     Exec["extract gg ${title}"]],
       creates   => "${goldengateHome}/ggsci",
       timeout   => 0,
-      path      => '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin',
+      path      => $execPath,
       user      => $user,
       group     => $group,
       logoutput => true,

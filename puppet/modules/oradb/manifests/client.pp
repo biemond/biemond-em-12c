@@ -7,11 +7,11 @@ define oradb::client(
   $oracleBase              = undef,
   $oracleHome              = undef,
   $dbPort                  = '1521',
-  $user                    = 'oracle',
-  $userBaseDir             = '/home',
-  $group                   = 'dba',
-  $group_install           = 'oinstall',
-  $downloadDir             = '/install',
+  $user                    = hiera('oradb:user'),
+  $userBaseDir             = hiera('oradb:user_base_dir'),
+  $group                   = hiera('oradb:group'),
+  $group_install           = hiera('oradb:group_install'),
+  $downloadDir             = hiera('oradb:download_dir'),
   $puppetDownloadMntPoint  = undef,
   $remoteFile              = true,
   $logoutput               = true,
@@ -43,12 +43,12 @@ define oradb::client(
 
   if ( $continue ) {
 
-    $execPath     = '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:'
+    $execPath = hiera('oradb:exec_path')
 
     if $puppetDownloadMntPoint == undef {
-      $mountPoint     = 'puppet:///modules/oradb/'
+      $mountPoint = hiera('oradb:module_mountpoint')
     } else {
-      $mountPoint     = $puppetDownloadMntPoint
+      $mountPoint = $puppetDownloadMntPoint
     }
 
     # db file installer zip

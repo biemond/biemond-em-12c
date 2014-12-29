@@ -1,7 +1,7 @@
 # == define: oradb::utils::dbcreatefolder
 #
 define oradb::utils::dbcreatefolder(
-  $prefix           = undef,
+  $prefix = undef,
 ) {
 
   # remove prefix

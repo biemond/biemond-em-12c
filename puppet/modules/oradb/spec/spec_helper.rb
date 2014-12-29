@@ -8,6 +8,8 @@ end
 
 require 'rspec-puppet'
 require 'puppetlabs_spec_helper/module_spec_helper'
+require 'fixtures/modules/module_data/lib/hiera/backend/module_data_backend.rb'
+
 fixture_path = File.expand_path(File.join(__FILE__, '..', 'fixtures'))
 # include common helpers
 support_path = File.expand_path(File.join(File.dirname(__FILE__), '..','spec/support/*.rb'))
@@ -17,6 +19,7 @@ RSpec.configure do |c|
   c.config = '/doesnotexist'
   c.module_path  = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures/modules'))
   c.manifest_dir = File.expand_path(File.join(File.dirname(__FILE__), 'fixtures/manifests'))
+  c.hiera_config = File.join('spec', 'fixtures', 'hiera', 'hiera.yaml')
 end
 
 def param_value(subject, type, title, param)

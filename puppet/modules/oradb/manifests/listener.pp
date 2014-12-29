@@ -13,24 +13,25 @@
 #
 define oradb::listener( $oracleBase  = undef,
                         $oracleHome  = undef,
-                        $user        = 'oracle',
-                        $group       = 'dba',
+                        $user        = hiera('oradb:user'),
+                        $group       = hiera('oradb:group'),
                         $action      = 'start',
 )
 {
-  $execPath = "/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:${oracleHome}/bin"
+  $execPath = hiera('oradb:exec_path')
+
 
   case $::kernel {
     'Linux': {
-      $ps_bin = '/bin/ps'
-      $ps_arg = '-ef'
+      $ps_bin = hiera('oradb:ps_bin')
+      $ps_arg = hiera('oradb:ps_arg')
     }
     'SunOS': {
-      $ps_arg = 'awwx'
+      $ps_arg = hiera('oradb:ps_arg')
       if $::kernelrelease == '5.11' {
-        $ps_bin = '/bin/ps'
+        $ps_bin =  hiera('oradb:ps_bin_5_11')
       } else {
-        $ps_bin = '/usr/ucb/ps'
+        $ps_bin = hiera('oradb:ps_bin')
       }
     }
     default: {

@@ -17,12 +17,12 @@ define oradb::installdb(
   $eeOptionalComponents    = undef, # 'oracle.rdbms.partitioning:11.2.0.4.0,oracle.oraolap:11.2.0.4.0,oracle.rdbms.dm:11.2.0.4.0,oracle.rdbms.dv:11.2.0.4.0,oracle.rdbms.lbac:11.2.0.4.0,oracle.rdbms.rat:11.2.0.4.0'
   $createUser              = undef,
   $bashProfile             = true,
-  $user                    = 'oracle',
-  $userBaseDir             = '/home',
-  $group                   = 'dba',
-  $group_install           = 'oinstall',
-  $group_oper              = 'oper',
-  $downloadDir             = '/install',
+  $user                    = hiera('oradb:user'),
+  $userBaseDir             = hiera('oradb:user_base_dir','NotFound'),
+  $group                   = hiera('oradb:group'),
+  $group_install           = hiera('oradb:group_install'),
+  $group_oper              = hiera('oradb:group_oper'),
+  $downloadDir             = hiera('oradb:download_dir'),
   $zipExtract              = true,
   $puppetDownloadMntPoint  = undef,
   $remoteFile              = true,
@@ -37,16 +37,19 @@ define oradb::installdb(
     notify {"createUser parameter on installdb ${title} can be removed, createUser feature is removed from this oradb module":}
   }
 
-  if (!( $version in ['11.2.0.1','12.1.0.1','12.1.0.2','11.2.0.3','11.2.0.4'])){
-    fail('Unrecognized database install version, use 11.2.0.1|11.2.0.3|11.2.0.4|12.1.0.1|12.1.0.1')
+  $supported_db_versions = join( hiera('oradb:versions'), '|')
+  if ( $version in $supported_db_versions == false ){
+    fail("Unrecognized database install version, use ${supported_db_versions}")
   }
 
-  if ( !($::kernel in ['Linux','SunOS'])){
-    fail('Unrecognized operating system, please use it on a Linux or SunOS host')
+  $supported_db_kernels = join( hiera('oradb:kernels'), '|')
+  if ( $::kernel in $supported_db_kernels == false){
+    fail("Unrecognized operating system, please use it on a ${supported_db_kernels} host")
   }
 
-  if ( !($databaseType in ['EE','SE','SEONE'])){
-    fail('Unrecognized database type, please use EE|SE|SEONE')
+  $supported_db_types = join( hiera('oradb:database_types'), '|')
+  if ( $databaseType in $supported_db_types == false){
+    fail("Unrecognized database type, please use ${supported_db_types}")
   }
 
   if ( $oracleBase == undef or is_string($oracleBase) == false) {fail('You must specify an oracleBase') }
@@ -70,12 +73,12 @@ define oradb::installdb(
     }
   }
 
-  $execPath     = '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:'
+  $execPath = hiera('oradb:exec_path')
 
   if $puppetDownloadMntPoint == undef {
-    $mountPoint     = 'puppet:///modules/oradb/'
+    $mountPoint = hiera('oradb:module_mountpoint')
   } else {
-    $mountPoint     = $puppetDownloadMntPoint
+    $mountPoint = $puppetDownloadMntPoint
   }
 
   if $oraInventoryDir == undef {
@@ -95,14 +98,15 @@ define oradb::installdb(
   if ( $continue ) {
 
     if ( $zipExtract ) {
-      # In $downloadDir, will Puppet extract the ZIP files or is this a pre-extracted directory structure.
+      # In $downloadDir, will Puppet extract the ZIP files or
+      # is this a pre-extracted directory structure.
 
-      if ( $version in ['11.2.0.1','12.1.0.1','12.1.0.2']) {
+      if ( $version in hiera('oradb:versions_full')) {
         $file1 =  "${file}_1of2.zip"
         $file2 =  "${file}_2of2.zip"
       }
 
-      if ( $version in ['11.2.0.3','11.2.0.4']) {
+      if ( $version in hiera('oradb:versions_patch')) {
         $file1 =  "${file}_1of7.zip"
         $file2 =  "${file}_2of7.zip"
       }
