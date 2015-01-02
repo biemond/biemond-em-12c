@@ -4,7 +4,5 @@ fixtures:
        repo: 'git://github.com/puppetlabs/puppetlabs-stdlib'
     'dirtree':
        repo: 'git://github.com/AlexCline/puppet-dirtree'
-    'module_data':
-       repo: 'git://github.com/ripienaar/puppet-module-data'
   symlinks:
     'oradb': '#{source_dir}'

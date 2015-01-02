@@ -1,6 +1,10 @@
 History
 ========
 
+16-12-2014  version 1.0.0
+--------------------------
+- Fixed some bugs
+
 27-11-2014  version 0.7.0
 --------------------------
 -Big API change. Change all type names to ora_..

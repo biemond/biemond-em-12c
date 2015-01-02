@@ -55,5 +55,7 @@ module Puppet
     property  :quotas
     property  :grants
 
+    autorequire (:ora_tablespace) {[default_tablespace, temporary_tablespace]}
+
   end
 end

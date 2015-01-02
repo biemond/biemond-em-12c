@@ -25,9 +25,9 @@ define oradb::rcu(
   $product                 = 'soasuite',
   $version                 = '11.1.1.7',
   $oracleHome              = undef,
-  $user                    = hiera('oradb:user'),
-  $group                   = hiera('oradb:group'),
-  $downloadDir             = hiera('oradb:download_dir'),
+  $user                    = 'oracle',
+  $group                   = 'dba',
+  $downloadDir             = '/install',
   $action                  = 'create',  # delete or create
   $dbServer                = undef,
   $dbService               = undef,
@@ -39,15 +39,17 @@ define oradb::rcu(
   $remoteFile              = true,
   $logoutput               = false,
 ){
-
-  $execPath = hiera('oradb:exec_path')
-
-  if (!( $::kernel == 'Linux')) {
-      fail('Unrecognized or not supported operating system, only Linux is supported')
+  case $::kernel {
+    'Linux': {
+      $execPath = '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin'
+    }
+    default: {
+      fail('Unrecognized or not supported operating system')
+    }
   }
 
   if $puppetDownloadMntPoint == undef {
-    $mountPoint = hiera('oradb:module_mountpoint')
+    $mountPoint = 'puppet:///modules/oradb/'
   } else {
     $mountPoint = $puppetDownloadMntPoint
   }

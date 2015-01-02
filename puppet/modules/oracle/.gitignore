@@ -1,9 +1,8 @@
-/modules/
 /.tmp/
 /.vagrant/
-pkg
+pkg/
 /spec/fixtures/
-log
-junit
+log/
+junit/
 spec/software
-software
+.vendor/

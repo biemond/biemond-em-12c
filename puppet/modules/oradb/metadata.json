@@ -12,10 +12,6 @@
     {
       "name": "AlexCline/dirtree",
       "version_requirement": ">= 0.2.1"
-    },
-    {
-      "name": "ripienaar/module_data",
-      "version_requirement": ">= 0.0.3"
     }
   ],
   "license": "Apache-2.0",

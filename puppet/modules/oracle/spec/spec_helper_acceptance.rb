@@ -48,8 +48,9 @@ RSpec.configure do |c|
       modules.each do  |module_name |
         on(default, puppet('module', 'install', module_name), :acceptable_exit_codes => [0,1] )
       end
-
-      scp_to default, "#{proj_root}/spec/software", '/software'
+      on(default, 'mkdir /software')
+      files = (1..3).collect {|no| "#{proj_root}/.vendor/p13390677_112040_Linux-x86-64_#{no}of7.zip"}
+      files.each {|f| scp_to default, f, '/software'}
       manifest = File.read("#{proj_root}/spec/acceptance/manifests/database.pp")
       apply_manifest manifest, { :catch_failures => true }
     end

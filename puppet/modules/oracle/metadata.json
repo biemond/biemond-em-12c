@@ -1,6 +1,6 @@
 {
   "name": "hajee-oracle",
-  "version": "0.7.0",
+  "version": "1.0.0",
   "author": "Bert Hajee",
   "summary": "the custom types needed to manage the basic setup of an Oracle database",
   "license": "Apache-2.0",
@@ -9,7 +9,7 @@
   "issues_url": "https://github.com/hajee/oracle/issues",
   "description": "the custom types needed to manage the basic setup of an Oracle database. It contains: tablespace, oracle_user, grant etc",
   "dependencies": [
-    {"name":"hajee/easy_type","version_requirement":">= 0.13.0 < 1.0.0"}
+    {"name":"hajee/easy_type","version_requirement":">= 0.14.0 < 0.15.0"}
   ],
   "operatingsystem_support": [
       {

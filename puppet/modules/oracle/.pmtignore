@@ -1,0 +1,8 @@
+.DS_Store
+log/
+junit/
+gemfiles/
+spec/
+.vendor/
+.vagrant/
+tests/

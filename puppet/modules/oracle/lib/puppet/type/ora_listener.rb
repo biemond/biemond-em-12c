@@ -1,6 +1,5 @@
 module Puppet
-  newtype(:ora_
-    listener) do
+  newtype(:ora_listener) do
     desc "This is the oracle listener process"
 
     newproperty(:ensure) do

@@ -2,17 +2,18 @@
 #
 define oradb::net(
   $oracleHome   = undef,
-  $version      = undef,
-  $user         = hiera('oradb:user'),
-  $group        = hiera('oradb:group'),
-  $downloadDir  = hiera('oradb:download_dir'),
+  $version      = '11.2',
+  $user         = 'oracle',
+  $group        = 'dba',
+  $downloadDir  = '/install',
   $dbPort       = '1521',
 ){
-  if ( $version in hiera('oradb:net_versions') == false ) {
-    fail('Unrecognized version for oradb::net')
+  if $version in ['11.2','12.1'] {
+  } else {
+    fail('Unrecognized version')
   }
 
-  $execPath = hiera('oradb:exec_path')
+  $execPath = '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin'
 
   file { "${downloadDir}/netca_${version}.rsp":
     ensure  => present,

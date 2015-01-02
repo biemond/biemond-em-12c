@@ -8,19 +8,19 @@ define oradb::installasm(
   $gridBase                = undef,
   $gridHome                = undef,
   $oraInventoryDir         = undef,
-  $user                    = hiera('oradb:user_grid'),
-  $userBaseDir             = hiera('oradb:user_base_dir'),
-  $group                   = hiera('oradb:group_grid'),
-  $group_install           = hiera('oradb:group_install'),
-  $group_oper              = hiera('oradb:group_oper_grid'),
-  $group_asm               = hiera('oradb:group_asm_grid'),
-  $downloadDir             = hiera('oradb:download_dir'),
+  $user                    = 'grid',
+  $userBaseDir             = '/home',
+  $group                   = 'asmdba',
+  $group_install           = 'oinstall',
+  $group_oper              = 'asmoper',
+  $group_asm               = 'asmadmin',
   $sys_asm_password        = 'Welcome01',
   $asm_monitor_password    = 'Welcome01',
   $asm_diskgroup           = 'DATA',
   $disk_discovery_string   = undef,
   $disk_redundancy         = 'NORMAL',
   $disks                   = undef,
+  $downloadDir             = '/install',
   $zipExtract              = true,
   $puppetDownloadMntPoint  = undef,
   $remoteFile              = true,
@@ -42,26 +42,19 @@ define oradb::installasm(
     if ( $cluster_nodes == undef or is_string($cluster_nodes) == false) {fail('You must specify cluster_nodes if cluster_name is defined') }
     if ( $network_interface_list == undef or is_string($network_interface_list) == false) {fail('You must specify network_interface_list if cluster_name is defined') }
     if ( $storage_option == undef or is_string($storage_option) == false) {fail('You must specify storage_option if cluster_name is defined') }
-
-    $grid_storage_option = join( hiera('oradb:grid_storage_option'), '|')
-    if ($storage_option in $grid_storage_option == false ){
-      fail("unknown storage_option, please use ${grid_storage_option}")
-    }
+    unless $storage_option in ['ASM_STORAGE', 'FILE_SYSTEM_STORAGE'] {fail 'storage_option must be either ASM_STORAGE of FILE_SYSTEM_STORAGE'}
   }
 
-  $supported_grid_versions = join( hiera('oradb:grid_versions'), '|')
-  if ( $version in $supported_grid_versions == false ){
-    fail("Unrecognized database grid install version, use ${supported_grid_versions}")
+  if (!( $version in ['11.2.0.4','12.1.0.1'] )){
+    fail('Unrecognized database grid install version, use 11.2.0.4 or 12.1.0.1')
   }
 
-  $supported_db_kernels = join( hiera('oradb:kernels'), '|')
-  if ( $::kernel in $supported_db_kernels == false){
-    fail("Unrecognized operating system, please use it on a ${supported_db_kernels} host")
+  if ( !($::kernel in ['Linux','SunOS'])){
+    fail('Unrecognized operating system, please use it on a Linux or SunOS host')
   }
 
-  $supported_grid_types = join( hiera('oradb:grid_type'), '|')
-  if ($gridType in $supported_grid_types == false ){
-    fail("Unrecognized database grid type, please use ${supported_grid_types}")
+  if ( !($gridType in ['CRS_CONFIG','HA_CONFIG','UPGRADE','CRS_SWONLY'])){
+    fail('Unrecognized database grid type, please use CRS_CONFIG|HA_CONFIG|UPGRADE|CRS_SWONLY')
   }
 
   if ( $gridBase == undef or is_string($gridBase) == false) {fail('You must specify an gridBase') }
@@ -70,6 +63,7 @@ define oradb::installasm(
   if ( $gridBase in $gridHome == false ){
     fail('gridHome folder should be under the gridBase folder')
   }
+
 
   # check if the oracle software already exists
   $found = oracle_exists( $gridHome )
@@ -101,22 +95,22 @@ define oradb::installasm(
 
   if ( $continue ) {
 
-    $execPath = hiera('oradb:exec_path')
+    $execPath     = '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:'
 
     if $puppetDownloadMntPoint == undef {
-      $mountPoint = hiera('oradb:module_mountpoint')
+      $mountPoint     = 'puppet:///modules/oradb/'
     } else {
-      $mountPoint = $puppetDownloadMntPoint
+      $mountPoint     = $puppetDownloadMntPoint
     }
 
     if ( $zipExtract ) {
       # In $downloadDir, will Puppet extract the ZIP files or is this a pre-extracted directory structure.
 
-      if ( $version in hiera('oradb:grid_versions_two_files')) {
+      if ( $version == '12.1.0.1') {
         $file1 =  "${file}_1of2.zip"
         $file2 =  "${file}_2of2.zip"
       }
-      if ( $version in hiera('oradb:grid_versions_one_file') ) {
+      if ( $version  == '11.2.0.4' ) {
         $file1 =  $file
       }
 
@@ -132,7 +126,7 @@ define oradb::installasm(
           before  => Exec["extract ${downloadDir}/${file1}"],
         }
 
-        if ( $version in hiera('oradb:grid_versions_two_files')) {
+        if ( $version == '12.1.0.1' ) {
           file { "${downloadDir}/${file2}":
             ensure  => present,
             source  => "${mountPoint}/${file2}",
@@ -160,7 +154,7 @@ define oradb::installasm(
         require   => Oradb::Utils::Dbstructure["grid structure ${version}"],
         before    => Exec["install oracle grid ${title}"],
       }
-      if ( $version in hiera('oradb:grid_versions_two_files')) {
+      if ( $version == '12.1.0.1' ) {
         exec { "extract ${downloadDir}/${file2}":
           command   => "unzip -o ${source}/${file2} -d ${downloadDir}/${file_without_ext}",
           timeout   => 0,
@@ -208,6 +202,7 @@ define oradb::installasm(
     if ! defined(File["${userBaseDir}/${user}/.bash_profile"]) {
       file { "${userBaseDir}/${user}/.bash_profile":
         ensure  => present,
+        # content => template('oradb/grid_bash_profile.erb'),
         content => regsubst(template('oradb/grid_bash_profile.erb'), '\r\n', "\n", 'EMG'),
         mode    => '0775',
         owner   => $user,
@@ -248,7 +243,7 @@ define oradb::installasm(
       }
 
       if ( $remoteFile == true ){
-        if ( $version in hiera('oradb:grid_versions_two_files')) {
+        if ( $version == '12.1.0.1') {
           exec { "remove oracle asm file2 ${file2} ${title}":
             command => "rm -rf ${downloadDir}/${file2}",
             user    => 'root',

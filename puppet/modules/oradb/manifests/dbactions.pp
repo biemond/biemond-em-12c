@@ -6,8 +6,8 @@
 #
 define oradb::dbactions(
   $oracleHome  = undef,
-  $user        = hiera('oradb:user'),
-  $group       = hiera('oradb:group'),
+  $user        = 'oracle',
+  $group       = 'dba',
   $action      = 'start',
   $dbName      = 'orcl',
 ){

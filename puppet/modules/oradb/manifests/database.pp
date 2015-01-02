@@ -7,10 +7,10 @@
 define oradb::database(
   $oracleBase               = undef,
   $oracleHome               = undef,
-  $version                  = undef, # 11.2|12.1
-  $user                     = hiera('oradb:user'),
-  $group                    = hiera('oradb:group'),
-  $downloadDir              = hiera('oradb:download_dir'),
+  $version                  = '11.2', # 11.2|12.1
+  $user                     = 'oracle',
+  $group                    = 'dba',
+  $downloadDir              = '/install',
   $action                   = 'create',
   $template                 = undef,
   $dbName                   = 'orcl',
@@ -36,13 +36,8 @@ define oradb::database(
   $cluster_nodes            = undef,
   $containerDatabase        = false, # 12.1 feature for pluggable database
 ){
-  if ( $version in hiera('oradb:database_versions') == false ) {
-    fail('Unrecognized version for oradb::database')
-  }
-
-  $supported_db_kernels = join( hiera('oradb:kernels'), '|')
-  if ( $::kernel in $supported_db_kernels == false){
-    fail("Unrecognized operating system, please use it on a ${supported_db_kernels} host")
+  if (!( $version in ['11.2','12.1'])) {
+    fail('Unrecognized version')
   }
 
   if $action == 'create' {
@@ -53,15 +48,15 @@ define oradb::database(
     fail('Unrecognized database action')
   }
 
-  if ( $databaseType in hiera('oradb:instance_types') == false ) {
+  if (!( $databaseType in ['MULTIPURPOSE','DATA_WAREHOUSING','OLTP'])) {
     fail('Unrecognized databaseType')
   }
 
-  if ( $emConfiguration in hiera('oradb:instance_em_configuration') == false) {
+  if (!( $emConfiguration in ['NONE','CENTRAL','LOCAL','ALL'])) {
     fail('Unrecognized emConfiguration')
   }
 
-  if ( $storageType in hiera('oradb:instance_storage_type') == false ) {
+  if (!( $storageType in ['FS','CFS','ASM'])) {
     fail('Unrecognized storageType')
   }
 
@@ -69,9 +64,19 @@ define oradb::database(
     fail('container or pluggable database is not supported on version 11.2')
   }
 
-  $execPath = hiera('oradb:exec_path')
-  $userBase = hiera('oradb:user_base_dir','NotFound')
-  $userHome = "${userBase}/${user}"
+  $execPath = '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin'
+
+  case $::kernel {
+    'Linux': {
+      $userHome = "/home/${user}"
+    }
+    'SunOS': {
+      $userHome = "/export/home/${user}"
+    }
+    default: {
+      fail('Unrecognized operating system')
+    }
+  }
 
   if (is_hash($initParams) or is_string($initParams)) {
     if is_hash($initParams) {
@@ -130,7 +135,7 @@ define oradb::database(
       path        => $execPath,
       user        => $user,
       group       => $group,
-      cwd         => $userHome,
+      cwd         => $oracleBase,
       environment => ["USER=${user}",],
       logoutput   => true,
     }
@@ -142,7 +147,7 @@ define oradb::database(
       path        => $execPath,
       user        => $user,
       group       => $group,
-      cwd         => $userHome,
+      cwd         => $oracleBase,
       environment => ["USER=${user}",],
       logoutput   => true,
     }

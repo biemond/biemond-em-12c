@@ -18,9 +18,9 @@ define oradb::installem(
   $sysman_password             = undef,
   $agent_registration_password = undef,
   $deployment_size             = 'SMALL', #'SMALL','MEDIUM','LARGE'
-  $user                        = hiera('oradb:user'),
-  $group                       = hiera('oradb:group_install'),
-  $download_dir                = hiera('oradb:download_dir'),
+  $user                        = 'oracle',
+  $group                       = 'oinstall',
+  $download_dir                = '/install',
   $zip_extract                 = true,
   $puppet_download_mnt_point   = undef,
   $remote_file                 = true,
@@ -28,14 +28,12 @@ define oradb::installem(
 )
 {
 
-  $supported_em_versions = join( hiera('oradb:enterprise_manager_versions'), '|')
-  if ( $version in $supported_em_versions == false ){
-    fail("Unrecognized em version, use ${supported_em_versions}")
+  if (!( $version in ['12.1.0.4'])){
+    fail('Unrecognized em version, use 12.1.0.4')
   }
 
-  $supported_db_kernels = join( hiera('oradb:kernels'), '|')
-  if ( $::kernel in $supported_db_kernels == false){
-    fail("Unrecognized operating system, please use it on a ${supported_db_kernels} host")
+  if ( !($::kernel in ['Linux','SunOS'])){
+    fail('Unrecognized operating system, please use it on a Linux or SunOS host')
   }
 
   # check if the oracle software already exists
@@ -68,10 +66,10 @@ define oradb::installem(
 
   if ( $continue ) {
 
-    $execPath = hiera('oradb:exec_path')
+    $execPath     = '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:'
 
     if $puppet_download_mnt_point == undef {
-      $mountPoint     = hiera('oradb:module_mountpoint')
+      $mountPoint     = 'puppet:///modules/oradb/'
     } else {
       $mountPoint     = $puppet_download_mnt_point
     }
@@ -79,11 +77,12 @@ define oradb::installem(
     if ( $zip_extract ) {
       # In $download_dir, will Puppet extract the ZIP files or is this a pre-extracted directory structure.
 
-      if ( $version in hiera('oradb:em_versions_three_files') ) {
+      if ( $version in ['12.1.0.4']) {
         $file1 =  "${file}_disk1.zip"
         $file2 =  "${file}_disk2.zip"
         $file3 =  "${file}_disk3.zip"
       }
+
 
       if $remote_file == true {
 

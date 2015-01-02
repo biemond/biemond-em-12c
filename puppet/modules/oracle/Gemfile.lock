@@ -224,11 +224,10 @@ GEM
     pry-debugger (0.2.3)
       debugger (~> 1.3)
       pry (>= 0.9.10, < 0.11.0)
-    puppet (3.6.2)
+    puppet (3.7.3)
       facter (> 1.6, < 3)
       hiera (~> 1.0)
       json_pure
-      rgen (~> 0.6.5)
     puppet-blacksmith (3.1.1)
       puppet (>= 2.7.16)
       rest-client
@@ -259,7 +258,6 @@ GEM
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
     retriable (1.4.1)
-    rgen (0.6.6)
     rspec (2.99.0)
       rspec-core (~> 2.99.0)
       rspec-expectations (~> 2.99.0)
@@ -327,7 +325,7 @@ DEPENDENCIES
   librarian-puppet
   pry
   pry-debugger
-  puppet (~> 3.6.0)
+  puppet (~> 3.7.0)
   puppet-blacksmith
   puppet-lint
   puppet-syntax

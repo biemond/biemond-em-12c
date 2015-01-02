@@ -4,8 +4,8 @@ define oradb::database_pluggable(
   $ensure                   = 'present',  #present|absent
   $version                  = '12.1',
   $oracle_home_dir          = undef,
-  $user                     = hiera('oradb:user'),
-  $group                    = hiera('oradb:group'),
+  $user                     = 'oracle',
+  $group                    = 'dba',
   $source_db                = undef,
   $pdb_name                 = undef,
   $pdb_datafile_destination = undef,
@@ -15,7 +15,7 @@ define oradb::database_pluggable(
   $log_output               = false,
 ){
 
-  if ( $version in hiera('oradb:database_pluggable_versions') == false ){
+  if (!( $version == '12.1')){
     fail('Unrecognized version, use 12.1')
   }
 
@@ -32,7 +32,7 @@ define oradb::database_pluggable(
     if ( $pdb_admin_password == undef or is_string($pdb_admin_password) == false) {fail('You must specify an pdb_admin_password') }
   }
 
-  $execPath = hiera('oradb:exec_path')
+  $execPath = '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin'
 
   if ( $ensure == 'present') {
     $command = "${oracle_home_dir}/bin/dbca -silent -createPluggableDatabase -sourceDB ${source_db} -pdbName ${pdb_name} -createPDBFrom DEFAULT -pdbAdminUserName ${pdb_admin_username} -pdbAdminPassword ${pdb_admin_password} -pdbDatafileDestination ${pdb_datafile_destination} -createUserTableSpace ${create_user_tablespace}"

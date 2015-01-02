@@ -4,8 +4,19 @@
 #
 class oradb::prepareautostart
 {
-  $execPath = hiera('oradb:exec_path')
-  $dboraLocation = hiera('oradb:dbora_dir')
+  $execPath = '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:'
+
+  case $::kernel {
+    'Linux': {
+      $dboraLocation = '/etc/init.d'
+    }
+    'SunOS': {
+      $dboraLocation = '/etc'
+    }
+    default: {
+      fail('Unrecognized operating system, please use it on a Linux or SunOS host')
+    }
+  }
 
   file { "${dboraLocation}/dbora" :
     ensure  => present,
