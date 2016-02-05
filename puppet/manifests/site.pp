@@ -64,9 +64,9 @@ class oraem_os {
 class oraem_install {
   require oraem_os
 
-  oradb::installem{ 'em12104':
-    version                     => '12.1.0.4',
-    file                        => 'em12104_linux64',
+  oradb::installem{ 'em12105':
+    version                     => '12.1.0.5',
+    file                        => 'em12105_linux64',
     oracle_base_dir             => '/oracle',
     oracle_home_dir             => '/oracle/product/12.1/em',
     agent_base_dir              => '/oracle/product/12.1/agent',

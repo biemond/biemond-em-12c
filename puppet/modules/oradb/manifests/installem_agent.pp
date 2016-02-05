@@ -2,9 +2,9 @@
 #
 #
 define oradb::installem_agent(
-  $version                     = '12.1.0.4',
+  $version                     = '12.1.0.5',
   $install_type                = undef, #'agentPull'|'agentDeploy'
-  $install_version             = '12.1.0.4.0',
+  $install_version             = '12.1.0.5.0',
   $install_platform            = 'Linux x86-64',
   $source                      = undef, # 'https://<OMS_HOST>:<OMS_PORT>/em/install/getAgentImage'|'/tmp/12.1.0.4.0_AgentCore_226_Linux_x64.zip'
   $ora_inventory_dir           = undef,
@@ -25,11 +25,12 @@ define oradb::installem_agent(
 )
 {
 
-  if (!( $version in ['12.1.0.4'])){
-    fail('Unrecognized em agent version, use 12.1.0.4')
+  if (!( $version in ['12.1.0.4', '12.1.0.5'])){
+    fail('Unrecognized em agent version, use 12.1.0.4 or 12.1.0.5')
   }
 
   # check if the oracle software already exists
+  validate_absolute_path( $agent_base_dir )
   $found = oracle_exists( $agent_base_dir )
 
   if $found == undef {
@@ -43,9 +44,11 @@ define oradb::installem_agent(
     }
   }
 
+  validate_absolute_path($oracle_base_dir)
   if $ora_inventory_dir == undef {
-    $oraInventory = "${oracle_base_dir}/oraInventory"
+    $oraInventory = pick($::oradb_inst_loc_data,oradb_cleanpath("${oracle_base_dir}/../oraInventory"))
   } else {
+    validate_absolute_path($ora_inventory_dir)
     $oraInventory = "${ora_inventory_dir}/oraInventory"
   }
 
@@ -75,7 +78,7 @@ define oradb::installem_agent(
     if ( $sysman_password == undef or is_string($sysman_password) == false) {fail('You must specify sysman_password') }
     if ( $oracle_base_dir == undef or is_string($oracle_base_dir) == false) {fail('You must specify oracle_base_dir') }
     if ( $agent_registration_password == undef or is_string($agent_registration_password) == false) {fail('You must specify agent_registration_password') }
-    if ( $em_upload_port == undef or is_string($em_upload_port) == false) {fail('You must specify em_upload_port') }
+    if ( $em_upload_port == undef or is_numeric($em_upload_port) == false) {fail('You must specify em_upload_port') }
 
     # chmod +x /tmp/AgentPull.sh
     if ( $install_type  == 'agentPull') {

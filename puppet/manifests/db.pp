@@ -93,36 +93,35 @@ class oradb_os {
 class oradb_12c {
   require oradb_os
 
-    oradb::installdb{ '12.1.0.1_Linux-x86-64':
-      version                => '12.1.0.1',
-      file                   => 'linuxamd64_12c_database',
-      databaseType           => 'EE',
-      oracleBase             => hiera('oracle_base_dir'),
-      oracleHome             => hiera('oracle_home_dir'),
-      userBaseDir            => '/home',
-      createUser             => false,
-      bashProfile            => false,
+    oradb::installdb{ '12.1.0.2_Linux-x86-64':
+      version                => '12.1.0.2',
+      file                   => 'linuxamd64_12102_database',
+      database_type          => 'EE',
+      oracle_base            => hiera('oracle_base_dir'),
+      oracle_home            => hiera('oracle_home_dir'),
+      user_base_dir          => '/home',
+      bash_profile           => false,
       user                   => hiera('oracle_os_user'),
       group                  => hiera('oracle_os_group'),
       group_install          => 'oinstall',
       group_oper             => 'oper',
-      downloadDir            => hiera('oracle_download_dir'),
-      remoteFile             => false,
-      puppetDownloadMntPoint => hiera('oracle_source'),
+      download_dir              => hiera('oracle_download_dir'),
+      remote_file               => false,
+      puppet_download_mnt_point => hiera('oracle_source'),
     }
 
     oradb::net{ 'config net8':
-      oracleHome   => hiera('oracle_home_dir'),
+      oracle_home  => hiera('oracle_home_dir'),
       version      => '12.1',
       user         => hiera('oracle_os_user'),
       group        => hiera('oracle_os_group'),
-      downloadDir  => hiera('oracle_download_dir'),
-      require      => Oradb::Installdb['12.1.0.1_Linux-x86-64'],
+      download_dir => hiera('oracle_download_dir'),
+      require      => Oradb::Installdb['12.1.0.2_Linux-x86-64'],
     }
 
     oradb::listener{'start listener':
-      oracleBase   => hiera('oracle_base_dir'),
-      oracleHome   => hiera('oracle_home_dir'),
+      oracle_base  => hiera('oracle_base_dir'),
+      oracle_home  => hiera('oracle_home_dir'),
       user         => hiera('oracle_os_user'),
       group        => hiera('oracle_os_group'),
       action       => 'start',
@@ -130,41 +129,41 @@ class oradb_12c {
     }
 
     oradb::database{ 'oraDb':
-      oracleBase              => hiera('oracle_base_dir'),
-      oracleHome              => hiera('oracle_home_dir'),
-      version                 => '12.1',
-      user                    => hiera('oracle_os_user'),
-      group                   => hiera('oracle_os_group'),
-      downloadDir             => hiera('oracle_download_dir'),
-      action                  => 'create',
-      dbName                  => hiera('oracle_database_name'),
-      dbDomain                => hiera('oracle_database_domain_name'),
-      sysPassword             => hiera('oracle_database_sys_password'),
-      systemPassword          => hiera('oracle_database_system_password'),
-      dataFileDestination     => "/oracle/oradata",
-      recoveryAreaDestination => "/oracle/flash_recovery_area",
-      characterSet            => "AL32UTF8",
-      nationalCharacterSet    => "UTF8",
-      emConfiguration         => 'NONE',
-      memoryTotal             => '2500',
-      sampleSchema            => 'FALSE',
-      databaseType            => "MULTIPURPOSE",
-      require                 => Oradb::Listener['start listener'],
+      oracle_base               => hiera('oracle_base_dir'),
+      oracle_home               => hiera('oracle_home_dir'),
+      version                   => '12.1',
+      user                      => hiera('oracle_os_user'),
+      group                     => hiera('oracle_os_group'),
+      download_dir              => hiera('oracle_download_dir'),
+      action                    => 'create',
+      db_name                   => hiera('oracle_database_name'),
+      db_domain                 => hiera('oracle_database_domain_name'),
+      sys_password              => hiera('oracle_database_sys_password'),
+      system_password           => hiera('oracle_database_system_password'),
+      data_file_destination     => "/oracle/oradata",
+      recovery_area_destination => "/oracle/flash_recovery_area",
+      character_set             => "AL32UTF8",
+      nationalcharacter_set     => "UTF8",
+      em_configuration          => 'NONE',
+      memory_total              => '2500',
+      sample_schema             => 'FALSE',
+      database_type             => "MULTIPURPOSE",
+      require                   => Oradb::Listener['start listener'],
     }
 
     oradb::dbactions{ 'start oraDb':
-      oracleHome              => hiera('oracle_home_dir'),
+      oracle_home             => hiera('oracle_home_dir'),
       user                    => hiera('oracle_os_user'),
       group                   => hiera('oracle_os_group'),
       action                  => 'start',
-      dbName                  => hiera('oracle_database_name'),
+      db_name                 => hiera('oracle_database_name'),
       require                 => Oradb::Database['oraDb'],
     }
 
     oradb::autostartdatabase{ 'autostart oracle':
-      oracleHome              => hiera('oracle_home_dir'),
+      oracle_home             => hiera('oracle_home_dir'),
       user                    => hiera('oracle_os_user'),
-      dbName                  => hiera('oracle_database_name'),
+      db_name                 => hiera('oracle_database_name'),
       require                 => Oradb::Dbactions['start oraDb'],
     }
 
@@ -241,29 +240,29 @@ class oradb_init {
 
 class oradb_em_agent {
 
-  # oradb::installem_agent{ 'em12104_agent':
-  #   version                     => '12.1.0.4',
-  #   source                      => 'https://10.10.10.25:7802/em/install/getAgentImage',
-  #   install_type                => 'agentPull',
-  #   install_platform            => 'Linux x86-64',
-  #   oracle_base_dir             => '/oracle',
-  #   agent_base_dir              => '/oracle/product/12.1/agent',
-  #   agent_instance_home_dir     => '/oracle/product/12.1/agent/agent_inst',
-  #   sysman_user                 => 'sysman',
-  #   sysman_password             => 'Welcome01',
-  #   agent_registration_password => 'Welcome01',
-  #   agent_port                  => 1830,
-  #   oms_host                    => '10.10.10.25',
-  #   oms_port                    => 7802,
-  #   em_upload_port              => 4903,
-  #   user                        => 'oracle',
-  #   group                       => 'dba',
-  #   download_dir                => '/var/tmp/install',
-  #   log_output                  => true,
-  # }
+  oradb::installem_agent{ 'em12105_agent':
+    version                     => '12.1.0.5',
+    source                      => 'https://10.10.10.25:7799/em/install/getAgentImage',
+    install_type                => 'agentPull',
+    install_platform            => 'Linux x86-64',
+    oracle_base_dir             => '/oracle',
+    agent_base_dir              => '/oracle/product/12.1/agent',
+    agent_instance_home_dir     => '/oracle/product/12.1/agent/agent_inst',
+    sysman_user                 => 'sysman',
+    sysman_password             => 'Welcome01',
+    agent_registration_password => 'Welcome01',
+    agent_port                  => 1830,
+    oms_host                    => '10.10.10.25',
+    oms_port                    => 7799,
+    em_upload_port              => 4889,
+    user                        => 'oracle',
+    group                       => 'dba',
+    download_dir                => '/var/tmp/install',
+    log_output                  => true,
+  }
 
-  # oradb::installem_agent{ 'em12104_agent2':
-  #   version                     => '12.1.0.4',
+  # oradb::installem_agent{ 'em12105_agent2':
+  #   version                     => '12.1.0.5',
   #   source                      => '/var/tmp/install/agent.zip',
   #   install_type                => 'agentDeploy',
   #   oracle_base_dir             => '/oracle',

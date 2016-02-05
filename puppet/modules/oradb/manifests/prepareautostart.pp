@@ -2,8 +2,11 @@
 #
 #  prepare autostart of the nodemanager for linux
 #
-class oradb::prepareautostart
-{
+class oradb::prepareautostart(
+  $oracle_home  = undef,
+  $user         = 'oracle',
+  $service_name = 'dbora'
+){
   $execPath = '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:'
 
   case $::kernel {
@@ -14,11 +17,11 @@ class oradb::prepareautostart
       $dboraLocation = '/etc'
     }
     default: {
-      fail('Unrecognized operating system, please use it on a Linux or SunOS host')
+      fail('Unrecognized kernel, please use it on a Linux or SunOS host')
     }
   }
 
-  file { "${dboraLocation}/dbora" :
+  file { "${dboraLocation}/${service_name}" :
     ensure  => present,
     mode    => '0755',
     owner   => 'root',
@@ -26,22 +29,22 @@ class oradb::prepareautostart
   }
 
   case $::operatingsystem {
-    'CentOS', 'RedHat', 'OracleLinux': {
-      exec { 'chkconfig dbora':
-        command   => 'chkconfig --add dbora',
-        require   => File['/etc/init.d/dbora'],
+    'CentOS', 'RedHat', 'OracleLinux', 'SLES': {
+      exec { "enable service ${service_name}":
+        command   => "chkconfig --add ${service_name}",
+        require   => File["/etc/init.d/${service_name}"],
         user      => 'root',
-        unless    => 'chkconfig | /bin/grep \'dbora\'',
+        unless    => "chkconfig --list | /bin/grep \'${service_name}\'",
         path      => $execPath,
         logoutput => true,
       }
     }
-    'Ubuntu', 'Debian', 'SLES':{
-      exec { 'update-rc.d dbora':
-        command   => 'update-rc.d dbora defaults',
-        require   => File['/etc/init.d/dbora'],
+    'Ubuntu', 'Debian':{
+      exec { "enable service ${service_name}":
+        command   => "update-rc.d ${service_name} defaults",
+        require   => File["/etc/init.d/${service_name}"],
         user      => 'root',
-        unless    => 'ls /etc/rc3.d/*dbora | /bin/grep \'dbora\'',
+        unless    => "ls /etc/rc3.d/*${service_name} | /bin/grep \'${service_name}\'",
         path      => $execPath,
         logoutput => true,
       }
@@ -53,9 +56,9 @@ class oradb::prepareautostart
         owner   => 'root',
         content => template('oradb/oradb_smf.xml.erb'),
       }
-      exec { 'chkconfig dbora':
+      exec { "enable service ${service_name}":
         command   => 'svccfg -v import /tmp/oradb_smf.xml',
-        require   => [File['/tmp/oradb_smf.xml'],File["${dboraLocation}/dbora"],],
+        require   => File['/tmp/oradb_smf.xml',"${dboraLocation}/${service_name}"],
         user      => 'root',
         unless    => 'svccfg list | grep oracledatabase',
         path      => $execPath,

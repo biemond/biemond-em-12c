@@ -30,7 +30,6 @@ module Puppet
 
         event
       end
-
     end
 
     newparam(:name) do
@@ -49,6 +48,12 @@ module Puppet
     newparam(:oracle_home) do
       desc <<-EOT
         The oracle database home folder.
+      EOT
+    end
+
+    newparam(:sys_user) do
+      desc <<-EOT
+        The sys username for the RCU check/install.
       EOT
     end
 
@@ -75,6 +80,5 @@ module Puppet
         The RCU statement.
       EOT
     end
-
   end
 end
