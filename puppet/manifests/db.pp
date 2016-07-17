@@ -8,11 +8,11 @@ node 'emdb.example.com'  {
 # operating settings for Database & Middleware
 class oradb_os {
 
-  # set the swap
-  class { 'swap_file':
-    swapfile     => '/var/swap.1',
-    swapfilesize => '8192000000'
-  }
+  # # set the swap
+  # class { 'swap_file':
+  #   swapfile     => '/var/swap.1',
+  #   swapfilesize => '8192000000'
+  # }
 
   # set the tmpfs
   mount { '/dev/shm':
@@ -136,6 +136,7 @@ class oradb_12c {
       group                     => hiera('oracle_os_group'),
       download_dir              => hiera('oracle_download_dir'),
       action                    => 'create',
+      # template_seeded           => '12.1.0.2.0_Database_Template_for_EM12_1_0_5_0_Small_deployment',
       db_name                   => hiera('oracle_database_name'),
       db_domain                 => hiera('oracle_database_domain_name'),
       sys_password              => hiera('oracle_database_sys_password'),
@@ -240,26 +241,26 @@ class oradb_init {
 
 class oradb_em_agent {
 
-  oradb::installem_agent{ 'em12105_agent':
-    version                     => '12.1.0.5',
-    source                      => 'https://10.10.10.25:7799/em/install/getAgentImage',
-    install_type                => 'agentPull',
-    install_platform            => 'Linux x86-64',
-    oracle_base_dir             => '/oracle',
-    agent_base_dir              => '/oracle/product/12.1/agent',
-    agent_instance_home_dir     => '/oracle/product/12.1/agent/agent_inst',
-    sysman_user                 => 'sysman',
-    sysman_password             => 'Welcome01',
-    agent_registration_password => 'Welcome01',
-    agent_port                  => 1830,
-    oms_host                    => '10.10.10.25',
-    oms_port                    => 7799,
-    em_upload_port              => 4889,
-    user                        => 'oracle',
-    group                       => 'dba',
-    download_dir                => '/var/tmp/install',
-    log_output                  => true,
-  }
+  # oradb::installem_agent{ 'em12105_agent':
+  #   version                     => '12.1.0.5',
+  #   source                      => 'https://10.10.10.25:7799/em/install/getAgentImage',
+  #   install_type                => 'agentPull',
+  #   install_platform            => 'Linux x86-64',
+  #   oracle_base_dir             => '/oracle',
+  #   agent_base_dir              => '/oracle/product/12.1/agent',
+  #   agent_instance_home_dir     => '/oracle/product/12.1/agent/agent_inst',
+  #   sysman_user                 => 'sysman',
+  #   sysman_password             => 'Welcome01',
+  #   agent_registration_password => 'Welcome01',
+  #   agent_port                  => 1830,
+  #   oms_host                    => '10.10.10.25',
+  #   oms_port                    => 7799,
+  #   em_upload_port              => 4889,
+  #   user                        => 'oracle',
+  #   group                       => 'dba',
+  #   download_dir                => '/var/tmp/install',
+  #   log_output                  => true,
+  # }
 
   # oradb::installem_agent{ 'em12105_agent2':
   #   version                     => '12.1.0.5',

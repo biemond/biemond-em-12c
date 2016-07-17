@@ -22,6 +22,7 @@ define oradb::installem_agent(
   $group                       = 'oinstall',
   $download_dir                = '/install',
   $log_output                  = false,
+  $oracle_hostname             = undef,
 )
 {
 
@@ -74,14 +75,15 @@ define oradb::installem_agent(
 
     if ( $source == undef or is_string($source) == false) {fail('You must specify source') }
     if ( $agent_base_dir == undef or is_string($agent_base_dir) == false) {fail('You must specify agent_base_dir') }
-    if ( $sysman_user == undef or is_string($sysman_user) == false) {fail('You must specify sysman_user') }
-    if ( $sysman_password == undef or is_string($sysman_password) == false) {fail('You must specify sysman_password') }
     if ( $oracle_base_dir == undef or is_string($oracle_base_dir) == false) {fail('You must specify oracle_base_dir') }
     if ( $agent_registration_password == undef or is_string($agent_registration_password) == false) {fail('You must specify agent_registration_password') }
     if ( $em_upload_port == undef or is_numeric($em_upload_port) == false) {fail('You must specify em_upload_port') }
 
     # chmod +x /tmp/AgentPull.sh
     if ( $install_type  == 'agentPull') {
+
+      if ( $sysman_user == undef or is_string($sysman_user) == false) {fail('You must specify sysman_user') }
+      if ( $sysman_password == undef or is_string($sysman_password) == false) {fail('You must specify sysman_password') }
 
       if !defined(Package['curl']) {
         package { 'curl':
@@ -119,7 +121,7 @@ define oradb::installem_agent(
         require => Db_directory_structure["oracle em agent structure ${version}"],
       }
 
-      $command = "${download_dir}/AgentPull.sh LOGIN_USER=${sysman_user} LOGIN_PASSWORD=${sysman_password} PLATFORM=\"${install_platform}\" VERSION=${install_version} AGENT_BASE_DIR=${agent_base_dir} AGENT_REGISTRATION_PASSWORD=${agent_registration_password} RSPFILE_LOC=${download_dir}/em_agent.properties"
+      $command = "${download_dir}/AgentPull.sh LOGIN_USER=${sysman_user} LOGIN_PASSWORD=${sysman_password} PLATFORM=\"${install_platform}\" VERSION=${install_version} AGENT_BASE_DIR=${agent_base_dir} AGENT_REGISTRATION_PASSWORD=${agent_registration_password} ORACLE_HOSTNAME=${oracle_hostname} RSPFILE_LOC=${download_dir}/em_agent.properties"
 
       exec { "agentPull execute ${title}":
         command   => $command,

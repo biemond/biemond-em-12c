@@ -6,18 +6,17 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-
   config.vm.define "emdb" , primary: true do |emdb|
-    emdb.vm.box = "centos-6.6-x86_64"
-    emdb.vm.box_url = "https://dl.dropboxusercontent.com/s/ijt3ppej789liyp/centos-6.6-x86_64.box"
+    emdb.vm.box = "centos-6.7-x86_64"
+    emdb.vm.box_url = "https://dl.dropboxusercontent.com/s/m2pr3ln3iim1lzo/centos-6.7-x86_64.box"
 
     emdb.vm.provider :vmware_fusion do |v, override|
-      override.vm.box = "centos-6.6-x86_64-vmware"
-      override.vm.box_url = "https://dl.dropboxusercontent.com/s/7ytmqgghoo1ymlp/centos-6.6-x86_64-vmware.box"
+      override.vm.box = "centos-6.7-x86_64-vmware"
+      override.vm.box_url = "https://dl.dropboxusercontent.com/s/pr6kdd0nvzcuqg5/centos-6.7-x86_64-vmware.box"
     end
 
     emdb.vm.hostname = "emdb.example.com"
-    emdb.vm.synced_folder ".", "/vagrant", :mount_options => ["dmode=777","fmode=777"]
+    emdb.vm.synced_folder ".", "/vagrant"
     emdb.vm.synced_folder "/Users/edwin/software", "/software"
 
     emdb.vm.network :private_network, ip: "10.10.10.15"
@@ -53,12 +52,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define "emapp" , primary: true do |emapp|
-    emapp.vm.box = "centos-6.6-x86_64"
-    emapp.vm.box_url = "https://dl.dropboxusercontent.com/s/ijt3ppej789liyp/centos-6.6-x86_64.box"
+
+    emapp.vm.box = "centos-6.7-x86_64"
+    emapp.vm.box_url = "https://dl.dropboxusercontent.com/s/m2pr3ln3iim1lzo/centos-6.7-x86_64.box"
 
     emapp.vm.provider :vmware_fusion do |v, override|
-      override.vm.box = "centos-6.6-x86_64-vmware"
-      override.vm.box_url = "https://dl.dropboxusercontent.com/s/7ytmqgghoo1ymlp/centos-6.6-x86_64-vmware.box"
+      override.vm.box = "centos-6.7-x86_64-vmware"
+      override.vm.box_url = "https://dl.dropboxusercontent.com/s/pr6kdd0nvzcuqg5/centos-6.7-x86_64-vmware.box"
     end
 
     emapp.vm.hostname = "emapp.example.com"

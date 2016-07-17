@@ -1,8 +1,19 @@
 # Version updates
 
+## 2.0.6
+- Seeded database template support
+- oracle_hostname parameter for emagent
+- puppet 4 fixes
+
+## 2.0.5
+- EM agent, Move sysman parameter validation to agentpull block
+- Fix rcu status check, rollback from version 2.0.1
+- ASM service fix for RHEL7
+
 ## 2.0.4
 - dbtemplate_12.1.dbt database template should also work for 12.1.0.2
 - db_structure fixes, correct permissions and chown order
+- support for Enterprise Manager 12.1.0.5
 
 ## 2.0.3
 - some more strict file permissions

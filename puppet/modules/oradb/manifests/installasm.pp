@@ -20,6 +20,7 @@ define oradb::installasm(
   $asm_diskgroup             = 'DATA',
   $disk_discovery_string     = undef,
   $disk_redundancy           = 'NORMAL',
+  $disk_au_size              = 1,
   $disks                     = undef,
   $download_dir              = '/install',
   $zip_extract                = true,
@@ -34,6 +35,12 @@ define oradb::installasm(
 )
 {
 
+  case $disk_au_size {
+    1, 2, 4, 8, 16, 32, 64: {  } # Do nothing. These are valid values
+    default: {
+      fail("${disk_au_size} is an invalid disk_au_size. It needs to be one of these values: 1, 2, 4, 8, 16, 32, 64")
+    }
+  }
   $file_without_ext = regsubst($file, '(.+?)(\.zip*$|$)', '\1')
   #notify {"oradb::installasm file without extension ${$file_without_ext} ":}
 
@@ -185,7 +192,7 @@ define oradb::installasm(
 
     exec { "install oracle grid ${title}":
       command     => "/bin/sh -c 'unset DISPLAY;${download_dir}/${file_without_ext}/grid/runInstaller -silent -waitforcompletion -ignoreSysPrereqs -ignorePrereq -responseFile ${download_dir}/grid_install_${version}.rsp'",
-      creates     => $grid_home,
+      creates     => "${grid_home}/bin",
       environment => ["USER=${user}","LOGNAME=${user}"],
       timeout     => 0,
       returns     => [6,0],
@@ -206,6 +213,27 @@ define oradb::installasm(
         mode    => '0775',
         owner   => $user,
         group   => $group,
+      }
+    }
+
+    #because of RHEL7 uses systemd we need to create the service differently
+    if ($::osfamily == 'RedHat') and ($::operatingsystemmajrelease == '7')
+    {
+      file {'/etc/systemd/system/oracle-ohasd.service':
+        ensure  => 'file',
+        content => template('oradb/ohas.service.erb'),
+        mode    => '0644',
+        require => Exec["install oracle grid ${title}"],
+      } ->
+
+      exec { 'daemon-reload for ohas':
+        command => '/bin/systemctl daemon-reload',
+      } ->
+
+      service { 'ohas.service':
+        ensure => running,
+        enable => true,
+        before => Exec["run root.sh grid script ${title}"],
       }
     }
 
